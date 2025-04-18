@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Akram Tech - To-Do List</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        max-width: 600px;
+        margin: auto;
+        background-color: #f7f7f7;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      input, button {
+        padding: 10px;
+        margin: 5px 0;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #todo-list > div {
+        background: white;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My Todo App</h1>
+    <input id="todo-title" type="text" placeholder="Enter todo..." />
+    <input id="date-picker" type="date" />
+    <button onclick="addTodo()">Add Todo</button>
+
+    <div id="todo-list"></div>
+
+    <script>
+      // Model
+      let todos;
+      const savedTodos = JSON.parse(localStorage.getItem('todos'));
+      if (Array.isArray(savedTodos)) {
+        todos = savedTodos;
+      } else {
+        todos = [
+          { title: 'Get groceries', dueDate: '2024-10-04', id: 'id1' },
+          { title: 'Wash car', dueDate: '2024-02-03', id: 'id2' },
+          { title: 'Study programming', dueDate: '2024-03-04', id: 'id3' }
+        ];
+      }
+
+      const createTodo = (title, dueDate) => {
+        const id = '' + new Date().getTime();
+        todos.push({ title, dueDate, id });
+        saveTodos();
+      }
+
+      const removeTodo = (idToDelete) => {
+        todos = todos.filter(todo => todo.id !== idToDelete);
+        saveTodos();
+      }
+
+      const saveTodos = () => {
+        localStorage.setItem('todos', JSON.stringify(todos));
+      }
+
+      // Controller
+      const addTodo = () => {
+        const textbox = document.getElementById('todo-title');
+        const title = textbox.value.trim();
+
+        const datePicker = document.getElementById('date-picker');
+        const dueDate = datePicker.value;
+
+        // Input validation
+        if (!title || !dueDate) {
+          alert('Please enter both title and due date');
+          return;
+        }
+
+        createTodo(title, dueDate);
+        textbox.value = '';
+        datePicker.value = '';
+        render();
+      }
+
+      const deleteTodo = (event) => {
+        const idToDelete = event.target.id;
+        removeTodo(idToDelete);
+        render();
+      }
+
+      // View
+      const render = () => {
+        document.getElementById('todo-list').innerHTML = '';
+        todos.forEach(todo => {
+          const element = document.createElement('div');
+          element.innerText = `${todo.title} (Due: ${todo.dueDate})`;
+
+          const deleteButton = document.createElement('button');
+          deleteButton.innerText = 'Delete';
+          deleteButton.style.marginLeft = '12px';
+          deleteButton.onclick = deleteTodo;
+          deleteButton.id = todo.id;
+          element.appendChild(deleteButton);
+
+          document.getElementById('todo-list').appendChild(element);
+        });
+      }
+
+      render();
+    </script>
+  </body>
+</html>
